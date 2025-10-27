@@ -90,6 +90,7 @@ export default function ComprehensiveSolutions() {
 
   const opacity = useTransform(scrollYProgress, [0.1, 0.3, 0.5], [0, 1, 0]);
   const y = useTransform(scrollYProgress, [0, 0.3, 0.6], [100, 0, -100]);
+
   const activeVehicle = vehicleOptions.find((v) => v.id === activeTab);
 
   const togglePlayPause = () => {
@@ -101,10 +102,15 @@ export default function ComprehensiveSolutions() {
   };
 
   return (
-    <section ref={containerRef} className="bg-black text-white overflow-hidden">
+    <section
+      ref={containerRef}
+      className="bg-black text-white overflow-hidden"
+      aria-labelledby="solutions-heading"
+    >
       {/* Sticky heading */}
-      <div className="relative h-[120vh] flex items-center justify-center">
+      <header className="relative h-[120vh] flex items-center justify-center">
         <motion.h2
+          id="solutions-heading"
           style={{ opacity, y }}
           className="text-center text-xl md:text-3xl lg:text-5xl font-light leading-tight"
         >
@@ -113,9 +119,9 @@ export default function ComprehensiveSolutions() {
           <br />
           nonwoven solutions
         </motion.h2>
-      </div>
+      </header>
 
-      {/* Desktop layout (unchanged) */}
+      {/* Desktop layout */}
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -124,16 +130,25 @@ export default function ComprehensiveSolutions() {
         className="min-h-screen py-24 px-4 md:px-8 lg:px-16 hidden md:block"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-10">
-          {/* Left - Tabs */}
-          <div className="space-y-8">
+          {/* Tab List */}
+          <nav
+            aria-label="Vehicle categories"
+            role="tablist"
+            className="space-y-8"
+          >
             {vehicleOptions.map((vehicle) => (
               <button
                 key={vehicle.id}
+                id={`tab-${vehicle.id}`}
+                role="tab"
+                aria-selected={activeTab === vehicle.id}
+                aria-controls={`panel-${vehicle.id}`}
+                tabIndex={activeTab === vehicle.id ? 0 : -1}
                 onClick={() => {
                   setActiveTab(vehicle.id);
                   setCurrentVideo(vehicle.mainVideo);
                 }}
-                className={`block text-left transition-all duration-300 pl-5 py-5 border-l-2 ${
+                className={`block text-left transition-all duration-300 pl-5 py-5 border-l-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
                   activeTab === vehicle.id
                     ? "border-white opacity-100"
                     : "border-transparent opacity-50 hover:opacity-75"
@@ -147,119 +162,136 @@ export default function ComprehensiveSolutions() {
                 </p>
               </button>
             ))}
-          </div>
+          </nav>
 
-          {/* Right - Video + Features */}
-          <div className="relative flex flex-col items-center gap-10 justify-center h-full">
-            {activeVehicle && (
-              <div className="w-[500px] p-6 h-full max-w-md relative group">
-                <video
-                  ref={videoRef}
-                  key={activeVehicle.id}
-                  src={currentVideo}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  className="object-contain rounded-lg"
-                />
-                {/* Hide play/pause on mobile */}
-                <button
-                  onClick={togglePlayPause}
-                  className="hidden md:block absolute bottom-4 right-4 p-3 rounded-full bg-black/50 hover:bg-black/70 border border-white/30 hover:border-white transition-all"
-                >
-                  {isPlaying ? <Pause size={20} /> : <Play size={20} />}
-                </button>
-              </div>
-            )}
+          {/* Video and Features */}
+          <article
+            id={`panel-${activeVehicle.id}`}
+            role="tabpanel"
+            aria-labelledby={`tab-${activeVehicle.id}`}
+            tabIndex={0}
+            className="relative flex flex-col items-center gap-10 justify-center h-full"
+          >
+            <div className="w-[500px] p-6 h-full max-w-md relative group">
+              <video
+                ref={videoRef}
+                src={currentVideo}
+                autoPlay
+                muted
+                loop
+                playsInline
+                title={`${activeVehicle.title} showcase`}
+                aria-label={`Video showing ${activeVehicle.title}`}
+                className="object-contain rounded-lg"
+              />
+              <button
+                onClick={togglePlayPause}
+                aria-label={isPlaying ? "Pause video" : "Play video"}
+                className="hidden md:block absolute bottom-4 right-4 p-3 rounded-full bg-black/50 hover:bg-black/70 border border-white/30 hover:border-white transition-all focus-visible:ring-2 focus-visible:ring-sky-400"
+              >
+                {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+              </button>
+            </div>
 
-            <div className="flex flex-wrap justify-center gap-4 md:gap-6">
+            <ul
+              className="flex flex-wrap justify-center gap-4 md:gap-6"
+              role="list"
+              aria-label="Vehicle features"
+            >
               {(activeTab === "passenger"
                 ? features.passenger
                 : features.commercial
               ).map((feature, index) => (
-                <div
+                <li
                   key={feature.id}
                   className={`flex flex-col items-center gap-2 transition-all duration-300 cursor-pointer ${
                     index === currentFeatureIndex
                       ? "opacity-100 scale-110"
                       : "opacity-50"
                   }`}
-                  onClick={() => {
-                    setCurrentFeatureIndex(index);
-                    setCurrentVideo(feature.video);
-                  }}
                 >
-                  <div className="w-12 h-12 md:w-16 md:h-16 rounded-lg overflow-hidden bg-gray-900 border border-gray-700">
+                  <button
+                    onClick={() => {
+                      setCurrentFeatureIndex(index);
+                      setCurrentVideo(feature.video);
+                    }}
+                    aria-pressed={index === currentFeatureIndex}
+                    aria-label={`View ${feature.label} video`}
+                    className="focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 rounded-lg"
+                  >
                     <img
                       src={feature.img}
-                      alt={feature.label}
-                      className="w-full h-full object-cover"
+                      alt={`${feature.label} view`}
+                      className="w-12 h-12 md:w-16 md:h-16 rounded-lg overflow-hidden bg-gray-900 border border-gray-700 object-cover"
                     />
-                  </div>
+                  </button>
                   <span className="text-xs md:text-sm text-gray-400 text-center whitespace-nowrap">
                     {feature.label}
                   </span>
-                </div>
+                </li>
               ))}
-            </div>
-          </div>
+            </ul>
+          </article>
         </div>
       </motion.div>
 
       {/* ✅ Mobile layout */}
-<div className="md:hidden space-y-12 px-4 pb-20">
-  {vehicleOptions.map((vehicle) => (
-    <div key={vehicle.id} className="text-center">
-      <h3 className="text-lg font-semibold mb-1 text-sky-400">{vehicle.title}</h3>
-      <p className="text-sm text-gray-300 mb-4">{vehicle.description}</p>
+      <div className="md:hidden space-y-12 px-4 pb-20">
+        {vehicleOptions.map((vehicle) => (
+          <article
+            key={vehicle.id}
+            aria-labelledby={`mobile-${vehicle.id}-title`}
+          >
+            <h3
+              id={`mobile-${vehicle.id}-title`}
+              className="text-lg font-semibold mb-1 text-sky-400 text-center"
+            >
+              {vehicle.title}
+            </h3>
+            <p className="text-sm text-gray-300 mb-4 text-center">
+              {vehicle.description}
+            </p>
 
-      {/* Swiper for features */}
-      <Swiper
-        modules={[Pagination]}
-        pagination={{
-          clickable: true,
-          el: `.pagination-${vehicle.id}`,
-        }}
-        spaceBetween={20}
-        slidesPerView={1}
-        className="pb-10"
-        onSlideChange={(swiper) => {
-          const index = swiper.activeIndex;
-          const video = features[vehicle.id][index].video;
-          const videoEl = document.getElementById(`${vehicle.id}-video`);
-          if (videoEl) {
-            videoEl.src = video;
-            videoEl.play();
-          }
-        }}
-      >
-        {features[vehicle.id].map((feature) => (
-          <SwiperSlide key={feature.id}>
-            <div className="flex flex-col items-center mb-6">
-              <video
-                id={`${vehicle.id}-video`}
-                src={feature.video}
-                autoPlay
-                muted
-                loop
-                playsInline
-                className="rounded-lg w-full max-w-xs object-contain mb-3"
-              />
-              <span className="text-sm text-gray-300">{feature.label}</span>
-            </div>
-          </SwiperSlide>
+            <Swiper
+              modules={[Pagination]}
+              pagination={{
+                clickable: true,
+                el: `.pagination-${vehicle.id}`,
+              }}
+              spaceBetween={20}
+              slidesPerView={1}
+              className="pb-10"
+              aria-label={`${vehicle.title} features carousel`}
+            >
+              {features[vehicle.id].map((feature) => (
+                <SwiperSlide key={feature.id}>
+                  <div className="flex flex-col items-center mb-6">
+                    <video
+                      src={feature.video}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      title={`${feature.label} video`}
+                      aria-label={`Video of ${feature.label}`}
+                      className="rounded-lg w-full max-w-xs object-contain mb-3"
+                    />
+                    <span className="text-sm text-gray-300">
+                      {feature.label}
+                    </span>
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+
+            <div
+              className={`pagination-${vehicle.id} mt-2 flex justify-center gap-2`}
+              role="group"
+              aria-label="Carousel pagination"
+            ></div>
+          </article>
         ))}
-      </Swiper>
-
-      {/* Custom pagination container */}
-      <div
-        className={`pagination-${vehicle.id} mt-2  flex justify-center gap-2`}
-      ></div>
-    </div>
-  ))}
-</div>
-
+      </div>
     </section>
   );
 }
