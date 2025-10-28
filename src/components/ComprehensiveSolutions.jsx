@@ -235,7 +235,7 @@ export default function ComprehensiveSolutions() {
         </div>
       </motion.div>
 
-      {/* ✅ Mobile layout */}
+      {/* Mobile layout */}
       <div className="md:hidden space-y-12 px-4 pb-20">
         {vehicleOptions.map((vehicle) => (
           <article
