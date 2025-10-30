@@ -31,7 +31,7 @@ const Navbar = () => {
         isVisible ? "translate-y-0" : "-translate-y-full"
       } `}
     >
-      <div className="container  mx-auto h-full py-2 xl:py-3  flex items-center justify-between gap-4">
+      <div className="md:mx-[134px]  h-full py-2 xl:py-3  flex items-center justify-between gap-4">
         <a href="/" className="block">
           <img
             src={logo}

@@ -13,11 +13,11 @@ const Hero = () => {
       ></video>
 
       <div className="absolute inset-0 grid place-content-center place-items-center pt-10 md:pt-5 lg:pt-10 gap-2 text-center w-11/12 mx-auto">
-        <span className="font-light pt-2 pb-3 text-lg lg:text-xl font-manrope text-white block leading-snug">
+        <span className="font-light pt-2 pb-3 text-lg lg:text-[22px] font-manrope text-white block leading-snug">
           Driven by performance
         </span>
 
-        <h2 className="text-white text-[28px] md:text-4xl font-light leading-tight pb-2">
+        <h2 className="text-white text-[28px] md:text-[48px] font-light leading-tight pb-2">
           <span className="font-semibold">
             Soft trims and{" "}
             <span className="text-[#00BFFF]">NVH solutions</span>
